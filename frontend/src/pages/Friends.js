@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import Navbar from "../components/Navbar";
 
+const API = "https://codetracker-production-abf7.up.railway.app";
+
 function Friends() {
   const currentUser = localStorage.getItem("user")?.trim();
 
@@ -13,7 +15,7 @@ function Friends() {
   // 🔹 SEND REQUEST
   const sendRequest = async () => {
     try {
-      await axios.post("http://localhost:5000/api/friends/send-request", {
+      await axios.post(`${API}/api/friends/send-request`, {
         from: currentUser,
         to: sendTo.trim()
       });
@@ -30,7 +32,7 @@ function Friends() {
   const getRequests = async () => {
     try {
       const res = await axios.get(
-        `http://localhost:5000/api/friends/requests/${currentUser}`
+        `${API}/api/friends/requests/${currentUser}`
       );
 
       setRequests(res.data);
@@ -43,7 +45,7 @@ function Friends() {
   // 🔹 ACCEPT REQUEST
   const acceptRequest = async (fromUser) => {
     try {
-      await axios.post("http://localhost:5000/api/friends/accept-request", {
+      await axios.post(`${API}/api/friends/accept-request`, {
         from: fromUser,
         to: currentUser
       });
@@ -60,7 +62,7 @@ function Friends() {
   const loadLeaderboard = async () => {
     try {
       const res = await axios.get(
-        `http://localhost:5000/api/friends/leaderboard/${currentUser}`
+        `${API}/api/friends/leaderboard/${currentUser}`
       );
 
       setLeaderboard(res.data);
