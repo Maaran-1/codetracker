@@ -1,62 +1,107 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import Navbar from "../components/Navbar";
 
-function Login() {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+const API = "https://codetracker-production-abf7.up.railway.app";
 
-  const navigate = useNavigate();
+function Settings() {
+  const user = localStorage.getItem("user");
 
-  const login = async () => {
+  const [lc, setLc] = useState("");
+  const [cc, setCc] = useState("");
+  const [cf, setCf] = useState("");
+  const [avatar, setAvatar] = useState("avatar1");
+
+  useEffect(() => {
+    loadUserData();
+  }, []);
+
+  const loadUserData = async () => {
     try {
-      const res = await axios.post(
-        "http://localhost:5000/api/auth/login",
-        { username, password }
+      const res = await axios.get(
+        `${API}/api/user/${user}` // ✅ FIXED
       );
 
-      localStorage.setItem("user", res.data.user.username);
+      setLc(res.data.lcUsername || "");
+      setCc(res.data.ccUsername || "");
+      setCf(res.data.cfUsername || "");
+      setAvatar(res.data.avatar || "avatar1");
 
-      navigate("/dashboard");
+      localStorage.setItem("avatar", res.data.avatar || "avatar1");
+
     } catch (err) {
-      alert("Invalid login");
+      console.error(err);
     }
   };
 
-  const register = async () => {
+  const save = async () => {
     try {
-      await axios.post(
-        "http://localhost:5000/api/auth/register",
-        { username, password }
-      );
+      await axios.put(`${API}/api/user/update`, { // ✅ FIXED
+        username: user,
+        lcUsername: lc,
+        ccUsername: cc,
+        cfUsername: cf,
+        avatar
+      });
 
-      alert("Registered! Now login.");
+      localStorage.setItem("avatar", avatar);
+
+      alert("Saved!");
+
     } catch (err) {
-      alert("User exists");
+      console.error(err);
+      alert("Save failed");
     }
   };
 
   return (
-    <div className="center">
-      <h1>CodeTracker 🚀</h1>
+    <>
+      <Navbar />
 
-      <input
-        placeholder="Username"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-      />
+      <div className="container">
+        <h2>Settings</h2>
 
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
+        <input
+          placeholder="LeetCode Username"
+          value={lc}
+          onChange={(e) => setLc(e.target.value)}
+        />
 
-      <button onClick={login}>Login</button>
-      <button onClick={register}>Register</button>
-    </div>
+        <input
+          placeholder="CodeChef Username"
+          value={cc}
+          onChange={(e) => setCc(e.target.value)}
+        />
+
+        <input
+          placeholder="Codeforces Username"
+          value={cf}
+          onChange={(e) => setCf(e.target.value)}
+        />
+
+        <h3>Select Avatar</h3>
+
+        <div style={{ display: "flex", gap: "10px" }}>
+          {["avatar1", "avatar2", "avatar3", "avatar4"].map((a) => (
+            <img
+              key={a}
+              src={`/avatars/${a}.png`}
+              alt={a}
+              width={60}
+              style={{
+                border: avatar === a ? "3px solid cyan" : "2px solid gray",
+                borderRadius: "50%",
+                cursor: "pointer"
+              }}
+              onClick={() => setAvatar(a)}
+            />
+          ))}
+        </div>
+
+        <button onClick={save}>Save</button>
+      </div>
+    </>
   );
 }
 
-export default Login;
+export default Settings;
