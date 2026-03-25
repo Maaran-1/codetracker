@@ -12,9 +12,6 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// 🔥 CONNECT DB (ONLY ONCE)
-connectDB();
-
 // 🔥 ROUTES
 const leetcodeRoute = require("./routes/leetcode");
 app.use("/api/leetcode", leetcodeRoute);
@@ -45,15 +42,12 @@ app.get("/", (req, res) => {
   res.send("CodeTracker API running");
 });
 
-// 🔥 PORT (DEFINE BEFORE USE)
+// 🔥 PORT
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
-
+// 🔥 START SERVER + CONNECT DB
 app.listen(PORT, async () => {
   console.log(`Server running on port ${PORT}`);
 
-  await connectDB(); // 👈 move here
+  await connectDB(); // ✅ ONLY HERE
 });
