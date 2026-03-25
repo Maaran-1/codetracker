@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import Navbar from "../components/Navbar";
 
+const API = "https://codetracker-production-abf7.up.railway.app";
+
 function Chat() {
   const currentUser = localStorage.getItem("user");
 
@@ -16,35 +18,47 @@ function Chat() {
   }, []);
 
   const loadFriends = async () => {
-    const res = await axios.get(
-      `http://localhost:5000/api/friends/list/${currentUser}`
-    );
-    setFriends(res.data);
+    try {
+      const res = await axios.get(
+        `${API}/api/friends/list/${currentUser}`
+      );
+      setFriends(res.data);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   // 📥 load chat
   const loadChat = async (friend) => {
-    setSelected(friend);
+    try {
+      setSelected(friend);
 
-    const res = await axios.get(
-      `http://localhost:5000/api/chat/${currentUser}/${friend}`
-    );
+      const res = await axios.get(
+        `${API}/api/chat/${currentUser}/${friend}`
+      );
 
-    setChat(res.data);
+      setChat(res.data);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   // 📤 send message
   const sendMessage = async () => {
-    if (!message) return;
+    if (!message || !selected) return;
 
-    await axios.post("http://localhost:5000/api/chat/send", {
-      from: currentUser,
-      to: selected,
-      text: message
-    });
+    try {
+      await axios.post(`${API}/api/chat/send`, {
+        from: currentUser,
+        to: selected,
+        text: message
+      });
 
-    setMessage("");
-    loadChat(selected);
+      setMessage("");
+      loadChat(selected);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return (
@@ -78,7 +92,7 @@ function Chat() {
 
         {/* RIGHT: CHAT */}
         <div style={{ flex: 1, padding: "20px" }}>
-          <h3>Chat with {selected}</h3>
+          <h3>Chat with {selected || "..."}</h3>
 
           <div style={{
             height: "70%",
