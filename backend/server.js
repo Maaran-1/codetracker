@@ -7,9 +7,7 @@ const connectDB = require("./config/db");
 const app = express();
 
 // 🔥 MIDDLEWARE
-app.use(cors({
-  origin: "*"
-}));
+app.use(cors());
 app.use(express.json());
 
 // 🔥 ROUTES
