@@ -5,7 +5,8 @@ import Navbar from "../components/Navbar";
 const API = "https://codetracker-production-abf7.up.railway.app";
 
 function Settings() {
-  const user = localStorage.getItem("user");
+  const userData = JSON.parse(localStorage.getItem("user"));
+  const userId = userData?._id;
 
   const [lc, setLc] = useState("");
   const [cc, setCc] = useState("");
@@ -13,13 +14,15 @@ function Settings() {
   const [avatar, setAvatar] = useState("avatar1");
 
   useEffect(() => {
-    loadUserData();
-  }, []);
+    if (userId) {
+      loadUserData();
+    }
+  }, [userId]);
 
   const loadUserData = async () => {
     try {
       const res = await axios.get(
-        `${API}/api/user/${user}` // ✅ FIXED
+        `${API}/api/user/${userId}`
       );
 
       setLc(res.data.lcUsername || "");
@@ -36,8 +39,8 @@ function Settings() {
 
   const save = async () => {
     try {
-      await axios.put(`${API}/api/user/update`, { // ✅ FIXED
-        username: user,
+      await axios.put(`${API}/api/user/update`, {
+        userId: userId,
         lcUsername: lc,
         ccUsername: cc,
         cfUsername: cf,
