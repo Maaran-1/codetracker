@@ -2,13 +2,17 @@ const mongoose = require("mongoose");
 
 const connectDB = async () => {
   try {
+    if (!process.env.MONGO_URI) {
+      throw new Error("MONGO_URI is missing ❌");
+    }
+
     await mongoose.connect(process.env.MONGO_URI);
 
     console.log("MongoDB Atlas Connected ✅");
   } catch (err) {
     console.error("Mongo Error:", err.message);
-    process.exit(1);
+    // ❌ DO NOT crash app
   }
 };
-console.log("MONGO_URI:", process.env.MONGO_URI);
+
 module.exports = connectDB;
