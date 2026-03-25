@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import Navbar from "../components/Navbar";
 
+const API = "https://codetracker-production-abf7.up.railway.app";
+
 function Settings() {
   const user = localStorage.getItem("user");
 
@@ -17,7 +19,7 @@ function Settings() {
   const loadUserData = async () => {
     try {
       const res = await axios.get(
-        `http://localhost:5000/api/user/${user}`
+        `${API}/api/user/${user}` // ✅ FIXED
       );
 
       setLc(res.data.lcUsername || "");
@@ -25,7 +27,6 @@ function Settings() {
       setCf(res.data.cfUsername || "");
       setAvatar(res.data.avatar || "avatar1");
 
-      // also sync to localStorage
       localStorage.setItem("avatar", res.data.avatar || "avatar1");
 
     } catch (err) {
@@ -35,7 +36,7 @@ function Settings() {
 
   const save = async () => {
     try {
-      await axios.put("http://localhost:5000/api/user/update", {
+      await axios.put(`${API}/api/user/update`, { // ✅ FIXED
         username: user,
         lcUsername: lc,
         ccUsername: cc,
@@ -43,7 +44,6 @@ function Settings() {
         avatar
       });
 
-      // save avatar locally
       localStorage.setItem("avatar", avatar);
 
       alert("Saved!");
