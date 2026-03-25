@@ -6,8 +6,15 @@ const connectDB = require("./config/db");
 
 const app = express();
 
-// 🔥 MIDDLEWARE
-app.use(cors());
+// 🔥 MIDDLEWARE (FIXED CORS)
+app.use(cors({
+  origin: [
+    "http://localhost:3000",
+    "https://codetracker-bt1j-ahsnxvrvf-arpitmaan586-3498s-projects.vercel.app"
+  ],
+  credentials: true
+}));
+
 app.use(express.json());
 
 // 🔥 ROUTES
@@ -46,6 +53,5 @@ const PORT = process.env.PORT || 5000;
 // 🔥 START SERVER + CONNECT DB
 app.listen(PORT, async () => {
   console.log(`Server running on port ${PORT}`);
-
-  await connectDB(); // ✅ ONLY HERE
+  await connectDB();
 });
