@@ -12,28 +12,28 @@ function Dashboard() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const user = localStorage.getItem("user");
+  const userData = JSON.parse(localStorage.getItem("user"));
+  const userId = userData?._id;
+  const username = userData?.username || "User";
 
   useEffect(() => {
-    if (!user) {
+    if (!userId) {
       navigate("/");
       return;
     }
 
     loadUserData();
-  }, [user]);
+  }, [userId]);
 
   const loadUserData = async () => {
     try {
       const res = await axios.get(
-        `${API}/api/user/${user}` // ✅ FIXED
+        `${API}/api/user/${userId}`
       );
 
       const lc = res.data.lcUsername;
       const cc = res.data.ccUsername;
       const cf = res.data.cfUsername;
-
-      console.log("LC:", lc, "CC:", cc, "CF:", cf);
 
       if (!lc && !cc && !cf) {
         setLoading(false);
@@ -51,7 +51,7 @@ function Dashboard() {
   const fetchStats = async (lc, cc, cf) => {
     try {
       const res = await axios.get(
-        `${API}/api/stats?lc=${lc}&cc=${cc}&cf=${cf}` // ✅ FIXED
+        `${API}/api/stats?lc=${lc}&cc=${cc}&cf=${cf}`
       );
 
       setData(res.data);
@@ -63,7 +63,6 @@ function Dashboard() {
     }
   };
 
-  // 🔄 LOADING
   if (loading) {
     return (
       <>
@@ -73,13 +72,12 @@ function Dashboard() {
     );
   }
 
-  // ⚠️ NO USERNAME SET
   if (!data) {
     return (
       <>
         <Navbar />
         <div style={{ padding: "20px" }}>
-          <h2>Welcome {user}</h2>
+          <h2>Welcome {username}</h2>
           <p>Please set your usernames in Settings ⚙️</p>
           <button onClick={() => navigate("/settings")}>
             Go to Settings
@@ -89,15 +87,13 @@ function Dashboard() {
     );
   }
 
-  // ✅ MAIN UI
   return (
     <>
       <Navbar />
 
       <div className="container">
-        <h2>Welcome {user} 👋</h2>
+        <h2>Welcome {username} 👋</h2>
 
-        {/* 🔗 ACCOUNTS */}
         <div style={{
           marginTop: "20px",
           background: "#020617",
@@ -110,7 +106,6 @@ function Dashboard() {
           <p><b>Codeforces:</b> {data.codeforcesUsername || "Not set"}</p>
         </div>
 
-        {/* 🔥 CARDS */}
         <div className="card-container">
           <div className="card">
             <h3>Total</h3>
@@ -133,13 +128,11 @@ function Dashboard() {
           </div>
         </div>
 
-        {/* 📊 GRAPH */}
         <div className="graph-section">
           <h3>Progress Overview 📊</h3>
           <StatsChart data={data} />
         </div>
 
-        {/* 🧩 PLATFORMS */}
         <div className="platform-grid">
           <div className="platform-card">
             <h4>LeetCode</h4>
